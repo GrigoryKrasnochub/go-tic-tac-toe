@@ -1,5 +1,7 @@
 package game
 
+import "errors"
+
 const emptyCellValue  = 0
 
 type Game struct {
@@ -8,8 +10,10 @@ type Game struct {
 	GameFinished   bool
 }
 
-func New(mapSizeX int, mapSizeY int) Game {
-
+func New(mapSizeX int, mapSizeY int) (*Game,error) {
+	if mapSizeX <= 0 || mapSizeY <= 0 {
+		return nil, errors.New("size matters, the sizeNumbers should be bigger")
+	}
 	//TODO добавить проверку на всякое
 	//Создаем пустой 2d срез
 	gameMap := make([][]int,0);
@@ -20,17 +24,17 @@ func New(mapSizeX int, mapSizeY int) Game {
 		//допихиваем в 2d срез обычный срез
 		gameMap = append(gameMap, tmp)
 	}
-	userGame := Game{GameMap : gameMap,UserTurn : true, GameFinished : false}
-	return userGame;
+	userGame := &Game{GameMap : gameMap,UserTurn : true, GameFinished : false}
+	return userGame, nil;
 }
 
-func MakeTurn(game *Game,x int,y int) bool{
+func MakeTurn(game *Game,x int,y int) (bool,error){
 	if x > len(game.GameMap) || x < 0 || y > len(game.GameMap[0]) || y < 0 {
-		return false
+		return false, errors.New("cell coordinates do not exist")
 	}
 
 	if game.GameMap[x][y] != emptyCellValue {
-		return false
+		return false,  errors.New("cell is not empty")
 	}
 
 	if game.UserTurn{
@@ -39,7 +43,7 @@ func MakeTurn(game *Game,x int,y int) bool{
 		game.GameMap[x][y] = 2;
 	}
 	game.UserTurn = !game.UserTurn
-	return true
+	return true, nil
 }
 
 func IsGameEnded(game Game) bool{

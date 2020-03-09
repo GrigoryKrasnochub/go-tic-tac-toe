@@ -44,6 +44,8 @@ func PrintMap(userGame game.Game){
 func DoConsoleGame(){
 	regex, _ := regexp.Compile(`(\d+)\s+(\d+)`)
 	reader := bufio.NewReader(os.Stdin)
+	errorMessage := ""
+	var userGame *game.Game
 	for {
 		var xMapSize int;
 		var yMapSize int;
@@ -55,13 +57,20 @@ func DoConsoleGame(){
 				if userMapSize[1] != "" && userMapSize[2] != "" {
 					xMapSize, _ = strconv.Atoi(userMapSize[1])
 					yMapSize, _ = strconv.Atoi(userMapSize[2])
-					break
+					if createdGame, createdGameError := game.New(xMapSize, yMapSize); createdGameError == nil {
+						userGame = createdGame
+						break
+					}else{
+						errorMessage = createdGameError.Error()
+					}
 				}
+			}else{
+				errorMessage = "incorrect format"
 			}
-			fmt.Println("Ooops! Something went wrong")
+			fmt.Println("Ooops! Something went wrong. Error text: ",errorMessage)
 		}
-		userGame := game.New(xMapSize, yMapSize)
-		if consoleGame(userGame) {
+
+		if consoleGame(*userGame) {
 			fmt.Println("Restart game? y/n")
 			text, _ := reader.ReadString('\n')
 			text = strings.Replace(text, "\n", "", -1)
@@ -78,6 +87,7 @@ func consoleGame(userGame game.Game) bool{
 	reader := bufio.NewReader(os.Stdin)
 	regex, _ := regexp.Compile(`(\d+)\s+(\d+)`)
 	players := [2]string {"Cross","Circle"}
+	errorMessage := ""
 	for !game.IsGameEnded(userGame) {
 		PrintMap(userGame)
 		for {
@@ -88,7 +98,11 @@ func consoleGame(userGame game.Game) bool{
 				if userCoordinates[1] != "" && userCoordinates[2] != "" {
 					xCoordinate, _ := strconv.Atoi(userCoordinates[1])
 					yCoordinate, _ := strconv.Atoi(userCoordinates[2])
-					if game.MakeTurn(&userGame,xCoordinate, yCoordinate){
+					gameTurnResult, gameTurnError := game.MakeTurn(&userGame,xCoordinate, yCoordinate)
+					if gameTurnError != nil {
+						errorMessage = gameTurnError.Error()
+					}
+					if gameTurnResult{
 						if game.IsWinningCombinationExistForCell(&userGame, xCoordinate, yCoordinate) {
 							var player string
 							//game turn was reverted
@@ -101,9 +115,13 @@ func consoleGame(userGame game.Game) bool{
 						}
 						break;
 					}
+				}else{
+					errorMessage = "incorrect format"
 				}
+			}else{
+				errorMessage = "incorrect format"
 			}
-			fmt.Println("Ooops! Something went wrong")
+			fmt.Println("Ooops! Something went wrong. Error text: ",errorMessage)
 		}
 	}
 	fmt.Println("Game Over")
