@@ -6,7 +6,6 @@ import (
 )
 
 func TestIsWinningCombinationExistForCellVertical1(t *testing.T) {
-	t.Parallel()
 	a := assert.New(t)
 	userGame := Game{
 		GameMap:      [][]int{
@@ -21,7 +20,6 @@ func TestIsWinningCombinationExistForCellVertical1(t *testing.T) {
 }
 
 func TestIsWinningCombinationExistForCellVertical2(t *testing.T) {
-	t.Parallel()
 	a := assert.New(t)
 	userGame := Game{
 		GameMap:      [][]int{
@@ -37,7 +35,6 @@ func TestIsWinningCombinationExistForCellVertical2(t *testing.T) {
 }
 
 func TestIsWinningCombinationExistForCellVertical3(t *testing.T) {
-	t.Parallel()
 	a := assert.New(t)
 	userGame := Game{
 		GameMap:      [][]int{
@@ -54,7 +51,6 @@ func TestIsWinningCombinationExistForCellVertical3(t *testing.T) {
 }
 
 func TestIsWinningCombinationExistForCellVertical4(t *testing.T) {
-	t.Parallel()
 	a := assert.New(t)
 	userGame := Game{
 		GameMap:      [][]int{
@@ -71,7 +67,6 @@ func TestIsWinningCombinationExistForCellVertical4(t *testing.T) {
 }
 
 func TestIsWinningCombinationExistForCellVertical5(t *testing.T) {
-	t.Parallel()
 	a := assert.New(t)
 	userGame := Game{
 		GameMap:      [][]int{
@@ -88,7 +83,6 @@ func TestIsWinningCombinationExistForCellVertical5(t *testing.T) {
 }
 
 func TestIsWinningCombinationExistForCellVertical6(t *testing.T) {
-	t.Parallel()
 	a := assert.New(t)
 	userGame := Game{
 		GameMap:      [][]int{

@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func PrintMap(userGame game.Game){
+func PrintMap(userGame game.Game) {
 
 	verticallyLen := len(userGame.GameMap)
 	horizontallyLen := len(userGame.GameMap[0])
@@ -18,75 +18,77 @@ func PrintMap(userGame game.Game){
 	var verticallyCharsIndentCount int = (verticallyLen / 10) + 1
 
 	//print first line
-	fmt.Printf("%*s",verticallyCharsIndentCount,"");
-	for y := 0; y < horizontallyLen; y++{
-		fmt.Printf("%*d",horizontallyCharsIndentCount,y)
+	fmt.Printf("%*s", verticallyCharsIndentCount, "")
+	for y := 0; y < horizontallyLen; y++ {
+		fmt.Printf("%*d", horizontallyCharsIndentCount, y)
 	}
-	fmt.Print("\n");
+	fmt.Print("\n")
 	//end print first line
 
-	for i, gameMapRow := range userGame.GameMap{
-		fmt.Printf("%*d",verticallyCharsIndentCount,i)
-		for _, gameMapCell := range gameMapRow{
+	for i, gameMapRow := range userGame.GameMap {
+		fmt.Printf("%*d", verticallyCharsIndentCount, i)
+		for _, gameMapCell := range gameMapRow {
 			switch gameMapCell {
 			case 0:
-				fmt.Printf("%*s",horizontallyCharsIndentCount,"_")
+				fmt.Printf("%*s", horizontallyCharsIndentCount, "_")
 			case 1:
-				fmt.Printf("%*s",horizontallyCharsIndentCount,"X")
+				fmt.Printf("%*s", horizontallyCharsIndentCount, "X")
 			case 2:
-				fmt.Printf("%*s",horizontallyCharsIndentCount,"O")
+				fmt.Printf("%*s", horizontallyCharsIndentCount, "O")
 			}
 		}
 		fmt.Print("\n")
 	}
 }
 
-func DoConsoleGame(){
+func DoConsoleGame() {
 	regex, _ := regexp.Compile(`(\d+)\s+(\d+)`)
 	reader := bufio.NewReader(os.Stdin)
 	errorMessage := ""
 	var userGame *game.Game
+	var xMapSize int
+	var yMapSize int
 	for {
-		var xMapSize int;
-		var yMapSize int;
-		for {
-			fmt.Println("Please write game map size in format \"xMapSize yMapSize\" (without semicolons)")
-			text, _ := reader.ReadString('\n')
-			userMapSize := regex.FindStringSubmatch(text)
-			if userMapSize != nil {
-				if userMapSize[1] != "" && userMapSize[2] != "" {
-					xMapSize, _ = strconv.Atoi(userMapSize[1])
-					yMapSize, _ = strconv.Atoi(userMapSize[2])
-					if createdGame, createdGameError := game.New(xMapSize, yMapSize); createdGameError == nil {
-						userGame = createdGame
-						break
-					}else{
-						errorMessage = createdGameError.Error()
-					}
-				}
-			}else{
-				errorMessage = "incorrect format"
-			}
-			fmt.Println("Ooops! Something went wrong. Error text: ",errorMessage)
+		if errorMessage != "" {
+			fmt.Println("Ooops! Something went wrong. Error text: ", errorMessage)
+		}
+		errorMessage = ""
+
+		fmt.Println("Please write game map size in format \"xMapSize yMapSize\" (without semicolons)")
+		text, _ := reader.ReadString('\n')
+		userMapSize := regex.FindStringSubmatch(text)
+		if userMapSize == nil || userMapSize[1] == "" || userMapSize[2] == "" {
+			errorMessage = "incorrect format"
+			continue
 		}
 
+		xMapSize, _ = strconv.Atoi(userMapSize[1])
+		yMapSize, _ = strconv.Atoi(userMapSize[2])
+		createdGame, createdGameError := game.New(xMapSize, yMapSize)
+
+		if createdGameError != nil {
+			errorMessage = createdGameError.Error()
+			continue
+		}
+
+		userGame = createdGame
 		if consoleGame(*userGame) {
 			fmt.Println("Restart game? y/n")
 			text, _ := reader.ReadString('\n')
 			text = strings.Replace(text, "\n", "", -1)
 			if strings.Compare("y", text) == 0 {
 				fmt.Println("Game RESTARTED!")
-			}else{
+			} else {
 				break
 			}
 		}
 	}
 }
 
-func consoleGame(userGame game.Game) bool{
+func consoleGame(userGame game.Game) bool {
 	reader := bufio.NewReader(os.Stdin)
 	regex, _ := regexp.Compile(`(\d+)\s+(\d+)`)
-	players := [2]string {"Cross","Circle"}
+	players := [2]string{"Cross", "Circle"}
 	errorMessage := ""
 	for !game.IsGameEnded(userGame) {
 		PrintMap(userGame)
@@ -94,34 +96,34 @@ func consoleGame(userGame game.Game) bool{
 			fmt.Println("Make your turn, write coordinates in format \"xCoordinate yCoordinate\" (without semicolons)")
 			text, _ := reader.ReadString('\n')
 			userCoordinates := regex.FindStringSubmatch(text)
-			if userCoordinates != nil{
+			if userCoordinates != nil {
 				if userCoordinates[1] != "" && userCoordinates[2] != "" {
 					xCoordinate, _ := strconv.Atoi(userCoordinates[1])
 					yCoordinate, _ := strconv.Atoi(userCoordinates[2])
-					gameTurnResult, gameTurnError := game.MakeTurn(&userGame,xCoordinate, yCoordinate)
+					gameTurnResult, gameTurnError := game.MakeTurn(&userGame, xCoordinate, yCoordinate)
 					if gameTurnError != nil {
 						errorMessage = gameTurnError.Error()
 					}
-					if gameTurnResult{
+					if gameTurnResult {
 						if game.IsWinningCombinationExistForCell(&userGame, xCoordinate, yCoordinate) {
 							var player string
 							//game turn was reverted
 							if userGame.UserTurn {
 								player = players[1]
-							}else {
+							} else {
 								player = players[0]
 							}
 							fmt.Printf("%s win\n", player)
 						}
-						break;
+						break
 					}
-				}else{
+				} else {
 					errorMessage = "incorrect format"
 				}
-			}else{
+			} else {
 				errorMessage = "incorrect format"
 			}
-			fmt.Println("Ooops! Something went wrong. Error text: ",errorMessage)
+			fmt.Println("Ooops! Something went wrong. Error text: ", errorMessage)
 		}
 	}
 	fmt.Println("Game Over")
