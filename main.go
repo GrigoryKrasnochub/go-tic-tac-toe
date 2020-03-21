@@ -1,9 +1,6 @@
 package main
 
-import (
-	"awesomeProject/game/console"
-)
-
+import "goTicTacToe/game/console"
 
 func main() {
 	console.DoConsoleGame()

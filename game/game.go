@@ -27,7 +27,11 @@ func New(mapSizeX int, mapSizeY int) (*Game, error) {
 	return userGame, nil
 }
 
-func MakeTurn(game *Game, x int, y int) (bool, error) {
+func (game Game) IsGameEnded() bool {
+	return !isNextTurnAvailable(game) || game.GameFinished
+}
+
+func (game *Game) MakeTurn (x int, y int) (bool, error) {
 	if x > len(game.GameMap) || x < 0 || y > len(game.GameMap[0]) || y < 0 {
 		return false, errors.New("cell coordinates do not exist")
 	}
@@ -45,16 +49,7 @@ func MakeTurn(game *Game, x int, y int) (bool, error) {
 	return true, nil
 }
 
-func IsGameEnded(game Game) bool {
-	return !isNextTurnAvailable(game) || game.GameFinished
-}
-
-func IsWinningCombinationExist(game Game, x int, y int) bool {
-	//TODO метод проверяет всю карту на предмет выигрышных комбинаций
-	return true
-}
-
-func IsWinningCombinationExistForCell(game *Game, x int, y int) bool {
+func (game *Game) IsWinningCombinationExistForCell(x int, y int) bool {
 	cellValue := game.GameMap[x][y]
 	gameMapXLen := len(game.GameMap)
 	gameMapYLen := len(game.GameMap[0])

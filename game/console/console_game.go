@@ -1,9 +1,9 @@
 package console
 
 import (
-	"awesomeProject/game"
 	"bufio"
 	"fmt"
+	"goTicTacToe/game"
 	"os"
 	"regexp"
 	"strconv"
@@ -51,8 +51,8 @@ func DoConsoleGame() {
 	for {
 		if errorMessage != "" {
 			fmt.Println("Ooops! Something went wrong. Error text: ", errorMessage)
+			errorMessage = ""
 		}
-		errorMessage = ""
 
 		fmt.Println("Please write game map size in format \"xMapSize yMapSize\" (without semicolons)")
 		text, _ := reader.ReadString('\n')
@@ -90,40 +90,41 @@ func consoleGame(userGame game.Game) bool {
 	regex, _ := regexp.Compile(`(\d+)\s+(\d+)`)
 	players := [2]string{"Cross", "Circle"}
 	errorMessage := ""
-	for !game.IsGameEnded(userGame) {
-		PrintMap(userGame)
-		for {
-			fmt.Println("Make your turn, write coordinates in format \"xCoordinate yCoordinate\" (without semicolons)")
-			text, _ := reader.ReadString('\n')
-			userCoordinates := regex.FindStringSubmatch(text)
-			if userCoordinates != nil {
-				if userCoordinates[1] != "" && userCoordinates[2] != "" {
-					xCoordinate, _ := strconv.Atoi(userCoordinates[1])
-					yCoordinate, _ := strconv.Atoi(userCoordinates[2])
-					gameTurnResult, gameTurnError := game.MakeTurn(&userGame, xCoordinate, yCoordinate)
-					if gameTurnError != nil {
-						errorMessage = gameTurnError.Error()
-					}
-					if gameTurnResult {
-						if game.IsWinningCombinationExistForCell(&userGame, xCoordinate, yCoordinate) {
-							var player string
-							//game turn was reverted
-							if userGame.UserTurn {
-								player = players[1]
-							} else {
-								player = players[0]
-							}
-							fmt.Printf("%s win\n", player)
-						}
-						break
-					}
-				} else {
-					errorMessage = "incorrect format"
-				}
-			} else {
-				errorMessage = "incorrect format"
-			}
+	for !userGame.IsGameEnded() {
+
+		if errorMessage != "" {
 			fmt.Println("Ooops! Something went wrong. Error text: ", errorMessage)
+			errorMessage = ""
+		} else {
+			PrintMap(userGame)
+		}
+
+		fmt.Println("Make your turn, write coordinates in format \"xCoordinate yCoordinate\" (without semicolons)")
+		text, _ := reader.ReadString('\n')
+		userCoordinates := regex.FindStringSubmatch(text)
+		if userCoordinates == nil || userCoordinates[1] == "" || userCoordinates[2] == "" {
+			errorMessage = "incorrect format"
+			continue
+		}
+
+		xCoordinate, _ := strconv.Atoi(userCoordinates[1])
+		yCoordinate, _ := strconv.Atoi(userCoordinates[2])
+		_, gameTurnError := userGame.MakeTurn(xCoordinate, yCoordinate)
+		if gameTurnError != nil {
+			errorMessage = gameTurnError.Error()
+			continue
+		}
+
+		if userGame.IsWinningCombinationExistForCell(xCoordinate, yCoordinate) {
+			var player string
+			//game turn was reverted
+			if userGame.UserTurn {
+				player = players[1]
+			} else {
+				player = players[0]
+			}
+			PrintMap(userGame)
+			fmt.Printf("%s win\n", player)
 		}
 	}
 	fmt.Println("Game Over")
