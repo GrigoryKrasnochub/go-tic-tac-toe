@@ -11,9 +11,9 @@ import (
 )
 
 func PrintMap(userGame game.Game) {
-
-	verticallyLen := len(userGame.GameMap)
-	horizontallyLen := len(userGame.GameMap[0])
+	gameMap := userGame.GetMap()
+	verticallyLen := len(gameMap)
+	horizontallyLen := len(gameMap[0])
 	var horizontallyCharsIndentCount int = (horizontallyLen / 10) + 2
 	var verticallyCharsIndentCount int = (verticallyLen / 10) + 1
 
@@ -25,7 +25,7 @@ func PrintMap(userGame game.Game) {
 	fmt.Print("\n")
 	//end print first line
 
-	for i, gameMapRow := range userGame.GameMap {
+	for i, gameMapRow := range gameMap {
 		fmt.Printf("%*d", verticallyCharsIndentCount, i)
 		for _, gameMapCell := range gameMapRow {
 			switch gameMapCell {
@@ -54,7 +54,7 @@ func DoConsoleGame() {
 			errorMessage = ""
 		}
 
-		fmt.Println("Please write game map size in format \"xMapSize yMapSize\" (without semicolons)")
+		fmt.Println("Please write game gmmap size in format \"xMapSize yMapSize\" (without semicolons)")
 		text, _ := reader.ReadString('\n')
 		userMapSize := regex.FindStringSubmatch(text)
 		if userMapSize == nil || userMapSize[1] == "" || userMapSize[2] == "" {
