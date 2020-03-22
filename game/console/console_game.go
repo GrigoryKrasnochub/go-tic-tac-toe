@@ -3,7 +3,7 @@ package console
 import (
 	"bufio"
 	"fmt"
-	"goTicTacToe/game"
+	"github.com/GrigoryKrasnochub/go-tic-tac-toe/game"
 	"os"
 	"regexp"
 	"strconv"
@@ -54,7 +54,7 @@ func DoConsoleGame() {
 			errorMessage = ""
 		}
 
-		fmt.Println("Please write game gmmap size in format \"xMapSize yMapSize\" (without semicolons)")
+		fmt.Println("Please write game map size in format \"VerticalMapSize HorizontalMapSize\" (without semicolons)")
 		text, _ := reader.ReadString('\n')
 		userMapSize := regex.FindStringSubmatch(text)
 		if userMapSize == nil || userMapSize[1] == "" || userMapSize[2] == "" {
@@ -99,7 +99,7 @@ func consoleGame(userGame game.Game) bool {
 			PrintMap(userGame)
 		}
 
-		fmt.Println("Make your turn, write coordinates in format \"xCoordinate yCoordinate\" (without semicolons)")
+		fmt.Println("Make your turn, write coordinates in format \"VerticalCoordinate HorizontalCoordinate\" (without semicolons)")
 		text, _ := reader.ReadString('\n')
 		userCoordinates := regex.FindStringSubmatch(text)
 		if userCoordinates == nil || userCoordinates[1] == "" || userCoordinates[2] == "" {

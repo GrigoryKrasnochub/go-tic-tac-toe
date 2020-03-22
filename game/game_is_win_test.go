@@ -2,8 +2,8 @@ package game
 
 import (
 	"fmt"
+	"github.com/GrigoryKrasnochub/go-tic-tac-toe/game/gmmap"
 	"github.com/stretchr/testify/assert"
-	"goTicTacToe/game/gmmap"
 	"testing"
 )
 

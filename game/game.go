@@ -2,7 +2,7 @@ package game
 
 import (
 	"errors"
-	"goTicTacToe/game/gmmap"
+	"github.com/GrigoryKrasnochub/go-tic-tac-toe/game/gmmap"
 )
 
 const emptyCellValue = 0
