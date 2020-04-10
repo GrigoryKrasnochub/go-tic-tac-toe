@@ -13,9 +13,9 @@ type Game struct {
 	gmmap.GameMapInterface
 }
 
-func New(mapSizeX int, mapSizeY int) (*Game, error) {
+func New(mapSizeVertical int, mapSizeHorizontal int) (*Game, error) {
 	userGame := &Game{UserTurn: true, GameFinished: false, GameMapInterface: &gmmap.InMemoryGameMap{}}
-	newMapError := userGame.NewMap(mapSizeX, mapSizeY)
+	newMapError := userGame.NewMap(mapSizeVertical, mapSizeHorizontal)
 	if newMapError != nil {
 		return nil, newMapError
 	}
@@ -24,24 +24,24 @@ func New(mapSizeX int, mapSizeY int) (*Game, error) {
 }
 
 func (game Game) IsGameEnded() bool {
-	return !isNextTurnAvailable(game) || game.GameFinished
+	return !game.isNextTurnAvailable() || game.GameFinished
 }
 
-func (game *Game) MakeTurn(x int, y int) (bool, error) {
-	gameMap := game.GetMap()
-	if x > len(gameMap) || x < 0 || y > len(gameMap[0]) || y < 0 {
+func (game *Game) MakeTurn(verticalValue int, horizontalValue int) (bool, error) {
+	cellValue, cellValueError := game.GetCellValue(verticalValue, horizontalValue)
+	if cellValueError != nil {
 		return false, errors.New("cell coordinates do not exist")
 	}
 
-	if gameMap[x][y] != emptyCellValue {
+	if cellValue != emptyCellValue {
 		return false, errors.New("cell is not empty")
 	}
 
 	var writeValueToCellError error
 	if game.UserTurn {
-		writeValueToCellError = game.WriteValueToCell(1, x, y)
+		writeValueToCellError = game.WriteValueToCell(1, verticalValue, horizontalValue)
 	} else {
-		writeValueToCellError = game.WriteValueToCell(2, x, y)
+		writeValueToCellError = game.WriteValueToCell(2, verticalValue, horizontalValue)
 	}
 
 	if writeValueToCellError != nil {
@@ -52,26 +52,26 @@ func (game *Game) MakeTurn(x int, y int) (bool, error) {
 	return true, nil
 }
 
-func (game *Game) IsWinningCombinationExistForCell(x int, y int) bool {
+func (game *Game) IsWinningCombinationExistForCell(verticalCoordinate int, horizontalCoordinate int) bool {
 	gameMap := game.GetMap()
 
-	cellValue := gameMap[x][y]
-	gameMapXLen := len(gameMap)
-	gameMapYLen := len(gameMap)
+	cellValue := gameMap[verticalCoordinate][horizontalCoordinate]
+	gameMapVerticalSize := game.GetMapVerticalSize()
+	gameMapHorizontalSize := game.GetMapHorizontalSize()
 
-	if x >= 0 && x < gameMapXLen && y >= 0 && y < gameMapYLen && cellValue != emptyCellValue {
+	if verticalCoordinate >= 0 && verticalCoordinate < gameMapVerticalSize && horizontalCoordinate >= 0 && horizontalCoordinate < gameMapHorizontalSize && cellValue != emptyCellValue {
 		//TODO написать более изысканную проверку
-		verticalCellValueStrike := getVerticallyValueStrikeForCell(gameMap, x, y)
+		verticalCellValueStrike := game.getVerticallyValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
 
-		horizontalCellValueStrike := getHorizontalValueStrikeForCell(gameMap, x, y)
+		horizontalCellValueStrike := game.getHorizontalValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
 
-		backSlashValueStrike := getBackSlashValueStrikeForCell(gameMap, x, y)
+		backSlashValueStrike := game.getBackSlashValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
 
-		slashValueStrike := getSlashValueStrikeForCell(gameMap, x, y)
+		slashValueStrike := game.getSlashValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
 
 		cellValueStrike := getMaxInt(verticalCellValueStrike, horizontalCellValueStrike, backSlashValueStrike, slashValueStrike)
 
-		if getGameCellsForWinCount(*game) <= cellValueStrike {
+		if game.getGameCellsForWinCount() <= cellValueStrike {
 			game.GameFinished = true
 			return true
 		}
@@ -79,16 +79,17 @@ func (game *Game) IsWinningCombinationExistForCell(x int, y int) bool {
 	return false
 }
 
-func getVerticallyValueStrikeForCell(gameMap [][]int, x int, y int) int {
-	cellValue := gameMap[x][y]
+func (game Game) getVerticallyValueStrikeForCell(verticalCoordinate int, horizontalCoordinate int) int {
+	cellValue, _ := game.GetCellValue(verticalCoordinate, horizontalCoordinate)
 	cellValueStrike := 0
 
 	holdValue := false
-	for i := 0; i < len(gameMap); i++ {
-		if i == x {
+	for i := 0; i < game.GetMapVerticalSize(); i++ {
+		if i == verticalCoordinate {
 			holdValue = true
 		}
-		if gameMap[i][y] == cellValue {
+		compareResult, _ := game.CompareCellValueToGivenValue(i, horizontalCoordinate, cellValue)
+		if compareResult {
 			cellValueStrike++
 		} else {
 			if !holdValue {
@@ -103,16 +104,17 @@ func getVerticallyValueStrikeForCell(gameMap [][]int, x int, y int) int {
 	return cellValueStrike
 }
 
-func getHorizontalValueStrikeForCell(gameMap [][]int, x int, y int) int {
-	cellValue := gameMap[x][y]
+func (game Game) getHorizontalValueStrikeForCell(verticalCoordinate int, horizontalCoordinate int) int {
+	cellValue, _ := game.GetCellValue(verticalCoordinate, horizontalCoordinate)
 	cellValueStrike := 0
 
 	holdValue := false
-	for i := 0; i < len(gameMap[0]); i++ {
-		if i == y {
+	for i := 0; i < game.GetMapHorizontalSize(); i++ {
+		if i == horizontalCoordinate {
 			holdValue = true
 		}
-		if gameMap[x][i] == cellValue {
+		compareResult, _ := game.CompareCellValueToGivenValue(verticalCoordinate, i, cellValue)
+		if compareResult {
 			cellValueStrike++
 		} else {
 			if !holdValue {
@@ -130,29 +132,30 @@ func getHorizontalValueStrikeForCell(gameMap [][]int, x int, y int) int {
 /*
 	\
 */
-func getBackSlashValueStrikeForCell(gameMap [][]int, x int, y int) int {
-	cellValue := gameMap[x][y]
+func (game Game) getBackSlashValueStrikeForCell(verticalCoordinate int, horizontalCoordinate int) int {
+	cellValue, _ := game.GetCellValue(verticalCoordinate, horizontalCoordinate)
 	cellValueStrike := 0
 
 	holdValue := false
 
 	var startCell [2]int
 
-	if x >= y {
-		startCell[0] = x - y
+	if verticalCoordinate >= horizontalCoordinate {
+		startCell[0] = verticalCoordinate - horizontalCoordinate
 		startCell[1] = 0
 	} else {
 		startCell[0] = 0
-		startCell[1] = y - x
+		startCell[1] = horizontalCoordinate - verticalCoordinate
 	}
 
 	horizontalCellCoordinate := startCell[1]
-	mapHorizontalLen := len(gameMap[0])
-	for i := startCell[0]; i < len(gameMap); i++ {
-		if i == x && horizontalCellCoordinate == y {
+	mapHorizontalSize := game.GetMapHorizontalSize()
+	for i := startCell[0]; i < game.GetMapVerticalSize(); i++ {
+		if i == verticalCoordinate && horizontalCellCoordinate == horizontalCoordinate {
 			holdValue = true
 		}
-		if gameMap[i][horizontalCellCoordinate] == cellValue {
+		compareResult, _ := game.CompareCellValueToGivenValue(i, horizontalCellCoordinate, cellValue)
+		if compareResult {
 			cellValueStrike++
 		} else {
 			if !holdValue {
@@ -166,7 +169,7 @@ func getBackSlashValueStrikeForCell(gameMap [][]int, x int, y int) int {
 
 		horizontalCellCoordinate++
 
-		if horizontalCellCoordinate >= mapHorizontalLen {
+		if horizontalCellCoordinate >= mapHorizontalSize {
 			break
 		}
 	}
@@ -176,28 +179,29 @@ func getBackSlashValueStrikeForCell(gameMap [][]int, x int, y int) int {
 /*
 	/
 */
-func getSlashValueStrikeForCell(gameMap [][]int, x int, y int) int {
-	cellValue := gameMap[x][y]
+func (game Game) getSlashValueStrikeForCell(verticalCoordinate int, horizontalCoordinate int) int {
+	cellValue, _ := game.GetCellValue(verticalCoordinate, horizontalCoordinate)
 	cellValueStrike := 0
 
 	holdValue := false
 
 	var startCell [2]int
 	startCell[0] = 0
-	startCell[1] = y + x
-	mapHorizontalLen := len(gameMap[0])
-	if startCell[1] >= mapHorizontalLen {
-		startCell[0] = startCell[1] - mapHorizontalLen + 1
-		startCell[1] = mapHorizontalLen - 1
+	startCell[1] = horizontalCoordinate + verticalCoordinate
+	mapHorizontalSize := game.GetMapHorizontalSize()
+	if startCell[1] >= mapHorizontalSize {
+		startCell[0] = startCell[1] - mapHorizontalSize + 1
+		startCell[1] = mapHorizontalSize - 1
 	}
 
 	horizontalCellCoordinate := startCell[1]
 
-	for i := startCell[0]; i < len(gameMap); i++ {
-		if i == x && horizontalCellCoordinate == y {
+	for i := startCell[0]; i < game.GetMapVerticalSize(); i++ {
+		if i == verticalCoordinate && horizontalCellCoordinate == horizontalCoordinate {
 			holdValue = true
 		}
-		if gameMap[i][horizontalCellCoordinate] == cellValue {
+		compareResult, _ := game.CompareCellValueToGivenValue(i, horizontalCellCoordinate, cellValue)
+		if compareResult {
 			cellValueStrike++
 		} else {
 			if !holdValue {
@@ -218,19 +222,18 @@ func getSlashValueStrikeForCell(gameMap [][]int, x int, y int) int {
 	return cellValueStrike
 }
 
-func getGameCellsForWinCount(game Game) int {
-	gameMap := game.GetMap()
-	verticalLen := len(gameMap)
-	horizontalLen := len(gameMap[0])
+func (game Game) getGameCellsForWinCount() int {
+	verticalMapSize := game.GetMapVerticalSize()
+	horizontalMapSize := game.GetMapHorizontalSize()
 
-	if verticalLen <= horizontalLen {
-		return verticalLen
+	if verticalMapSize <= horizontalMapSize {
+		return verticalMapSize
 	} else {
-		return horizontalLen
+		return horizontalMapSize
 	}
 }
 
-func isNextTurnAvailable(game Game) bool {
+func (game Game) isNextTurnAvailable() bool {
 	gameMap := game.GetMap()
 	for _, gameMapRow := range gameMap {
 		for _, gameMapCell := range gameMapRow {
