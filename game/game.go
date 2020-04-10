@@ -1,7 +1,6 @@
 package game
 
 import (
-	"errors"
 	"github.com/GrigoryKrasnochub/go-tic-tac-toe/game/gmmap"
 )
 
@@ -27,55 +26,49 @@ func (game Game) IsGameEnded() bool {
 	return !game.isNextTurnAvailable() || game.GameFinished
 }
 
-func (game *Game) MakeTurn(verticalValue int, horizontalValue int) (bool, error) {
-	cellValue, cellValueError := game.GetCellValue(verticalValue, horizontalValue)
-	if cellValueError != nil {
-		return false, errors.New("cell coordinates do not exist")
-	}
-
-	if cellValue != emptyCellValue {
-		return false, errors.New("cell is not empty")
-	}
-
+func (game *Game) MakeTurn(verticalValue int, horizontalValue int) error {
 	var writeValueToCellError error
 	if game.UserTurn {
-		writeValueToCellError = game.WriteValueToCell(1, verticalValue, horizontalValue)
+		writeValueToCellError = game.WriteValueToCell(gmmap.CrossCell, verticalValue, horizontalValue)
 	} else {
-		writeValueToCellError = game.WriteValueToCell(2, verticalValue, horizontalValue)
+		writeValueToCellError = game.WriteValueToCell(gmmap.CircleCell, verticalValue, horizontalValue)
 	}
 
 	if writeValueToCellError != nil {
-		return false, writeValueToCellError
+		return writeValueToCellError
 	}
 
 	game.UserTurn = !game.UserTurn
-	return true, nil
+	return nil
 }
 
 func (game *Game) IsWinningCombinationExistForCell(verticalCoordinate int, horizontalCoordinate int) bool {
-	gameMap := game.GetMap()
+	cellValue, getCellValueError := game.GetCellValue(verticalCoordinate, horizontalCoordinate)
 
-	cellValue := gameMap[verticalCoordinate][horizontalCoordinate]
-	gameMapVerticalSize := game.GetMapVerticalSize()
-	gameMapHorizontalSize := game.GetMapHorizontalSize()
-
-	if verticalCoordinate >= 0 && verticalCoordinate < gameMapVerticalSize && horizontalCoordinate >= 0 && horizontalCoordinate < gameMapHorizontalSize && cellValue != emptyCellValue {
-		//TODO написать более изысканную проверку
-		verticalCellValueStrike := game.getVerticallyValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
-
-		horizontalCellValueStrike := game.getHorizontalValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
-
-		backSlashValueStrike := game.getBackSlashValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
-
-		slashValueStrike := game.getSlashValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
-
-		cellValueStrike := getMaxInt(verticalCellValueStrike, horizontalCellValueStrike, backSlashValueStrike, slashValueStrike)
-
-		if game.getGameCellsForWinCount() <= cellValueStrike {
-			game.GameFinished = true
-			return true
-		}
+	if getCellValueError != nil {
+		return false
 	}
+
+	if cellValue.IsEmpty(){
+		return false
+	}
+
+	//TODO Do it in better way
+	verticalCellValueStrike := game.getVerticallyValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
+
+	horizontalCellValueStrike := game.getHorizontalValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
+
+	backSlashValueStrike := game.getBackSlashValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
+
+	slashValueStrike := game.getSlashValueStrikeForCell(verticalCoordinate, horizontalCoordinate)
+
+	cellValueStrike := getMaxInt(verticalCellValueStrike, horizontalCellValueStrike, backSlashValueStrike, slashValueStrike)
+
+	if game.getGameCellsForWinCount() <= cellValueStrike {
+		game.GameFinished = true
+		return true
+	}
+
 	return false
 }
 

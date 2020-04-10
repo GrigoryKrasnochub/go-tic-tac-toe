@@ -30,14 +30,7 @@ func PrintMap(userGame game.Game) {
 	for i, gameMapRow := range gameMap {
 		fmt.Printf("%*d", verticallyCharsIndentCount, i)
 		for _, gameMapCell := range gameMapRow {
-			switch gameMapCell {
-			case 0:
-				fmt.Printf("%*s", horizontallyCharsIndentCount, "_")
-			case 1:
-				fmt.Printf("%*s", horizontallyCharsIndentCount, "X")
-			case 2:
-				fmt.Printf("%*s", horizontallyCharsIndentCount, "O")
-			}
+			fmt.Printf("%*s", horizontallyCharsIndentCount, gameMapCell.String())
 		}
 		fmt.Print("\n")
 	}
@@ -114,7 +107,7 @@ func consoleGame(userGame game.Game) bool {
 
 		verticalCoordinate, _ := strconv.Atoi(userCoordinates[1])
 		horizontalCoordinate, _ := strconv.Atoi(userCoordinates[2])
-		_, gameTurnError := userGame.MakeTurn(verticalCoordinate, horizontalCoordinate)
+		gameTurnError := userGame.MakeTurn(verticalCoordinate, horizontalCoordinate)
 		if gameTurnError != nil {
 			errorMessage = gameTurnError.Error()
 			continue

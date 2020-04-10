@@ -1,12 +1,13 @@
 package gmmap
 
 type GameMapInterface interface {
-	WriteValueToCell(value int, xCoordinate int, yCoordinate int) error
-	GetMap() [][]int
+	WriteValueToCell(value CellValue, verticalCoordinate int, horizontalCoordinate int) error
+	GetMap() [][]CellValue
 	NewMap(verticalSize int, horizontalSize int) error
-	LoadGameMapFromSlice(gameMap [][]int)
-	GetCellValue(verticalCoordinate int, horizontalCoordinate int) (int, error)
-	CompareCellValueToGivenValue(verticalCoordinate int, horizontalCoordinate int, valueCompareTo int) (bool, error)
+	LoadGameMapFromSlice(gameMap [][]CellValue)
+	GetCellValue(verticalCoordinate int, horizontalCoordinate int) (CellValue, error)
+	GetCellValuePointer(verticalCoordinate int, horizontalCoordinate int) (*CellValue, error)
+	CompareCellValueToGivenValue(verticalCoordinate int, horizontalCoordinate int, valueCompareTo CellValue) (bool, error)
 	GetMapSize() [2]int
 	GetMapVerticalSize() int
 	GetMapHorizontalSize() int

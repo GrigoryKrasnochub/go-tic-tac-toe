@@ -9,7 +9,7 @@ import (
 
 type userGames struct {
 	userGame       Game
-	gameMap        [][]int
+	gameMap        [][]gmmap.CellValue
 	cellCoordinate [2]int
 	result         bool
 }
@@ -33,7 +33,7 @@ func TestGame_IsWinningCombinationExistForCellBackSlash(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{1, 0, 0},
 				{0, 1, 0},
 				{0, 0, 1},
@@ -45,7 +45,7 @@ func TestGame_IsWinningCombinationExistForCellBackSlash(t *testing.T) {
 			Game{GameMapInterface: &gmmap.InMemoryGameMap{},
 				UserTurn:     false,
 				GameFinished: false,},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 1, 0, 0, 0},
 				{0, 0, 1, 0, 0},
 				{0, 0, 0, 1, 0},
@@ -58,7 +58,7 @@ func TestGame_IsWinningCombinationExistForCellBackSlash(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 0, 0},
 				{1, 0, 0},
 				{0, 1, 0},
@@ -73,7 +73,7 @@ func TestGame_IsWinningCombinationExistForCellBackSlash(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 0, 0},
 				{1, 0, 0},
 				{0, 1, 0},
@@ -87,7 +87,7 @@ func TestGame_IsWinningCombinationExistForCellBackSlash(t *testing.T) {
 			Game{GameMapInterface: &gmmap.InMemoryGameMap{},
 				UserTurn:     false,
 				GameFinished: false,},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 0, 0},
 				{1, 0, 0},
 				{0, 1, 0},
@@ -101,7 +101,7 @@ func TestGame_IsWinningCombinationExistForCellBackSlash(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 1, 0, 0, 0},
 				{0, 0, 0, 0, 0},
 				{0, 0, 0, 1, 0},
@@ -119,7 +119,7 @@ func TestGame_IsWinningCombinationExistForCellSlash(t *testing.T) {
 			Game{GameMapInterface: &gmmap.InMemoryGameMap{},
 				UserTurn:     false,
 				GameFinished: false,
-			}, [][]int{
+			}, [][]gmmap.CellValue{
 			{0, 0, 1},
 			{0, 1, 0},
 			{1, 0, 0},
@@ -131,7 +131,7 @@ func TestGame_IsWinningCombinationExistForCellSlash(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 0, 0, 1, 0},
 				{0, 0, 1, 0, 0},
 				{0, 1, 0, 0, 0},
@@ -144,7 +144,7 @@ func TestGame_IsWinningCombinationExistForCellSlash(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 0, 0, 1},
 				{0, 0, 1, 0},
 				{0, 1, 0, 0},
@@ -157,7 +157,7 @@ func TestGame_IsWinningCombinationExistForCellSlash(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 0, 0, 0},
 				{0, 0, 0, 1},
 				{0, 0, 1, 0},
@@ -173,7 +173,7 @@ func TestGame_IsWinningCombinationExistForCellSlash(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
 				{0, 0, 0, 1},
@@ -196,7 +196,7 @@ func TestGame_IsWinningCombinationExistForCellVertical(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 1, 0},
 				{0, 1, 0},
 				{0, 1, 0},
@@ -209,7 +209,7 @@ func TestGame_IsWinningCombinationExistForCellVertical(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 1, 0, 0},
 				{0, 1, 0, 0},
 				{0, 1, 0, 0},
@@ -223,7 +223,7 @@ func TestGame_IsWinningCombinationExistForCellVertical(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 0, 0, 0, 1},
 				{0, 0, 0, 0, 1},
 				{0, 0, 0, 0, 1},
@@ -238,7 +238,7 @@ func TestGame_IsWinningCombinationExistForCellVertical(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{1, 0, 0, 0, 0},
 				{1, 0, 2, 0, 0},
 				{1, 0, 2, 0, 0},
@@ -253,7 +253,7 @@ func TestGame_IsWinningCombinationExistForCellVertical(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{1, 0, 0, 0, 0},
 				{1, 0, 2, 0, 0},
 				{1, 0, 2, 0, 0},
@@ -268,7 +268,7 @@ func TestGame_IsWinningCombinationExistForCellVertical(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{1, 0, 0, 0, 0},
 				{1, 0, 2, 0, 0},
 				{2, 0, 2, 0, 0},
@@ -283,7 +283,7 @@ func TestGame_IsWinningCombinationExistForCellVertical(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{1, 0, 0, 0, 0},
 				{1, 0, 2, 0, 0},
 				{1, 0, 2, 0, 0},
@@ -304,7 +304,7 @@ func TestGame_IsWinningCombinationExistForCellHorizontal(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{1, 1, 1, 1, 1},
 				{0, 0, 2, 0, 0},
 				{0, 0, 2, 0, 0},
@@ -319,7 +319,7 @@ func TestGame_IsWinningCombinationExistForCellHorizontal(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 0, 0, 0, 0},
 				{1, 0, 2, 0, 0},
 				{1, 1, 1, 1, 1},
@@ -334,7 +334,7 @@ func TestGame_IsWinningCombinationExistForCellHorizontal(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 0, 0, 0, 0},
 				{1, 0, 2, 0, 0},
 				{0, 0, 0, 0, 0},
@@ -349,7 +349,7 @@ func TestGame_IsWinningCombinationExistForCellHorizontal(t *testing.T) {
 				UserTurn:     false,
 				GameFinished: false,
 			},
-			[][]int{
+			[][]gmmap.CellValue{
 				{0, 0, 0, 0, 0},
 				{1, 0, 2, 0, 0},
 				{0, 0, 0, 0, 0},
