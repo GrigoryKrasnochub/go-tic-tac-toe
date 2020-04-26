@@ -8,7 +8,7 @@ type GameMapInterface interface {
 	GetCellValue(verticalCoordinate int, horizontalCoordinate int) (CellValue, error)
 	GetCellValuePointer(verticalCoordinate int, horizontalCoordinate int) (*CellValue, error)
 	CompareCellValueToGivenValue(verticalCoordinate int, horizontalCoordinate int, valueCompareTo CellValue) (bool, error)
-	GetMapSize() [2]int
+	GetMapSize() (int, int)
 	GetMapVerticalSize() int
 	GetMapHorizontalSize() int
 }

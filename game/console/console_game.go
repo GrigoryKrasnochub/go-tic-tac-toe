@@ -3,14 +3,15 @@ package console
 import (
 	"bufio"
 	"fmt"
-	"github.com/GrigoryKrasnochub/go-tic-tac-toe/game"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/GrigoryKrasnochub/go-tic-tac-toe/game"
 )
 
-var MustCompile, _ = regexp.Compile(`(\d+)\s+(\d+)`)
+var UserInputRegexp = regexp.MustCompile(`(\d+)\s+(\d+)`)
 
 func PrintMap(userGame game.Game) {
 	gameMap := userGame.GetMap()
@@ -37,7 +38,6 @@ func PrintMap(userGame game.Game) {
 }
 
 func DoConsoleGame() {
-	regex := MustCompile
 	reader := bufio.NewReader(os.Stdin)
 	errorMessage := ""
 	var userGame *game.Game
@@ -52,7 +52,7 @@ func DoConsoleGame() {
 		fmt.Println("Please write game map size in format \"VerticalMapSize HorizontalMapSize\" (without semicolons)")
 		fmt.Print(">")
 		text, _ := reader.ReadString('\n')
-		userMapSize := regex.FindStringSubmatch(text)
+		userMapSize := UserInputRegexp.FindStringSubmatch(text)
 		if userMapSize == nil || userMapSize[1] == "" || userMapSize[2] == "" {
 			errorMessage = "incorrect format"
 			continue
@@ -84,7 +84,6 @@ func DoConsoleGame() {
 
 func consoleGame(userGame game.Game) bool {
 	reader := bufio.NewReader(os.Stdin)
-	regex := MustCompile
 	players := [2]string{"Cross", "Circle"}
 	errorMessage := ""
 	for !userGame.IsGameEnded() {
@@ -99,7 +98,7 @@ func consoleGame(userGame game.Game) bool {
 		fmt.Println("Make your turn, write coordinates in format \"VerticalCoordinate HorizontalCoordinate\" (without semicolons)")
 		fmt.Print(">")
 		text, _ := reader.ReadString('\n')
-		userCoordinates := regex.FindStringSubmatch(text)
+		userCoordinates := UserInputRegexp.FindStringSubmatch(text)
 		if userCoordinates == nil || userCoordinates[1] == "" || userCoordinates[2] == "" {
 			errorMessage = "incorrect format"
 			continue

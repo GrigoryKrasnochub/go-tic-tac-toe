@@ -4,8 +4,6 @@ import (
 	"github.com/GrigoryKrasnochub/go-tic-tac-toe/game/gmmap"
 )
 
-const emptyCellValue = 0
-
 type Game struct {
 	UserTurn     bool
 	GameFinished bool
@@ -49,7 +47,7 @@ func (game *Game) IsWinningCombinationExistForCell(verticalCoordinate int, horiz
 		return false
 	}
 
-	if cellValue.IsEmpty(){
+	if cellValue.IsEmpty() {
 		return false
 	}
 
@@ -230,7 +228,7 @@ func (game Game) isNextTurnAvailable() bool {
 	gameMap := game.GetMap()
 	for _, gameMapRow := range gameMap {
 		for _, gameMapCell := range gameMapRow {
-			if gameMapCell == emptyCellValue {
+			if gameMapCell == gmmap.EmptyCell {
 				return true
 			}
 		}
