@@ -74,13 +74,6 @@ func (gm *InMemoryGameMap) GetCellValue(verticalCoordinate int, horizontalCoordi
 	return gm.gameMap[verticalCoordinate][horizontalCoordinate], nil
 }
 
-func (gm *InMemoryGameMap) GetCellValuePointer(verticalCoordinate int, horizontalCoordinate int) (*CellValue, error) {
-	if !gm.checkIsCellAvailable(verticalCoordinate, horizontalCoordinate) {
-		return nil, errors.New("cell is unreachable")
-	}
-	return &gm.gameMap[verticalCoordinate][horizontalCoordinate], nil
-}
-
 func (gm *InMemoryGameMap) CompareCellValueToGivenValue(verticalCoordinate int, horizontalCoordinate int, valueCompareTo CellValue) (bool, error) {
 	cellValue, getCellValueError := gm.GetCellValue(verticalCoordinate, horizontalCoordinate)
 	if getCellValueError != nil {

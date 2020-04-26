@@ -214,8 +214,7 @@ func (game Game) getSlashValueStrikeForCell(verticalCoordinate int, horizontalCo
 }
 
 func (game Game) getGameCellsForWinCount() int {
-	verticalMapSize := game.GetMapVerticalSize()
-	horizontalMapSize := game.GetMapHorizontalSize()
+	verticalMapSize, horizontalMapSize := game.GetMapSize()
 
 	if verticalMapSize <= horizontalMapSize {
 		return verticalMapSize
