@@ -4,8 +4,6 @@ import (
 	"github.com/GrigoryKrasnochub/go-tic-tac-toe/game/gmmap"
 )
 
-const emptyCellValue = 0
-
 type Game struct {
 	UserTurn     bool
 	GameFinished bool
@@ -49,7 +47,7 @@ func (game *Game) IsWinningCombinationExistForCell(verticalCoordinate int, horiz
 		return false
 	}
 
-	if cellValue.IsEmpty(){
+	if cellValue.IsEmpty() {
 		return false
 	}
 
@@ -216,8 +214,7 @@ func (game Game) getSlashValueStrikeForCell(verticalCoordinate int, horizontalCo
 }
 
 func (game Game) getGameCellsForWinCount() int {
-	verticalMapSize := game.GetMapVerticalSize()
-	horizontalMapSize := game.GetMapHorizontalSize()
+	verticalMapSize, horizontalMapSize := game.GetMapSize()
 
 	if verticalMapSize <= horizontalMapSize {
 		return verticalMapSize
@@ -230,7 +227,7 @@ func (game Game) isNextTurnAvailable() bool {
 	gameMap := game.GetMap()
 	for _, gameMapRow := range gameMap {
 		for _, gameMapCell := range gameMapRow {
-			if gameMapCell == emptyCellValue {
+			if gameMapCell.IsEmpty() {
 				return true
 			}
 		}

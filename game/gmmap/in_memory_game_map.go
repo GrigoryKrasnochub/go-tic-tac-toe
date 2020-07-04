@@ -1,6 +1,9 @@
 package gmmap
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type InMemoryGameMap struct {
 	gameMap           [][]CellValue
@@ -8,26 +11,25 @@ type InMemoryGameMap struct {
 	horizontalMapSize int
 }
 
-func (inMemoryGameMap *InMemoryGameMap) GetMapSize() [2]int {
-	result := [2]int{inMemoryGameMap.verticalMapSize, inMemoryGameMap.horizontalMapSize}
-	return result
+func (gm *InMemoryGameMap) GetMapSize() (int, int) {
+	return gm.verticalMapSize, gm.horizontalMapSize
 }
 
-func (inMemoryGameMap *InMemoryGameMap) GetMapHorizontalSize() int {
-	return inMemoryGameMap.horizontalMapSize
+func (gm *InMemoryGameMap) GetMapHorizontalSize() int {
+	return gm.horizontalMapSize
 }
 
-func (inMemoryGameMap *InMemoryGameMap) GetMapVerticalSize() int {
-	return inMemoryGameMap.verticalMapSize
+func (gm *InMemoryGameMap) GetMapVerticalSize() int {
+	return gm.verticalMapSize
 }
 
-func (inMemoryGameMap *InMemoryGameMap) LoadGameMapFromSlice(gameMap [][]CellValue) {
-	inMemoryGameMap.gameMap = gameMap
-	inMemoryGameMap.horizontalMapSize = len(gameMap[0])
-	inMemoryGameMap.verticalMapSize = len(gameMap)
+func (gm *InMemoryGameMap) LoadGameMapFromSlice(gameMap [][]CellValue) {
+	gm.gameMap = gameMap
+	gm.horizontalMapSize = len(gameMap[0])
+	gm.verticalMapSize = len(gameMap)
 }
 
-func (inMemoryGameMap *InMemoryGameMap) NewMap(verticalSize int, horizontalSize int) error {
+func (gm *InMemoryGameMap) NewMap(verticalSize int, horizontalSize int) error {
 	if verticalSize <= 0 || horizontalSize <= 0 {
 		return errors.New("size matters, the sizeNumbers should be bigger")
 	}
@@ -39,48 +41,41 @@ func (inMemoryGameMap *InMemoryGameMap) NewMap(verticalSize int, horizontalSize 
 		//допихиваем в 2d срез обычный срез
 		gameMap = append(gameMap, tmp)
 	}
-	inMemoryGameMap.gameMap = gameMap
-	inMemoryGameMap.verticalMapSize = verticalSize
-	inMemoryGameMap.horizontalMapSize = horizontalSize
+	gm.gameMap = gameMap
+	gm.verticalMapSize = verticalSize
+	gm.horizontalMapSize = horizontalSize
 	return nil
 }
 
-func (inMemoryGameMap *InMemoryGameMap) WriteValueToCell(value CellValue, verticalCoordinate int, horizontalCoordinate int) error {
-	cellVal, getCellValueError := inMemoryGameMap.GetCellValuePointer(verticalCoordinate, horizontalCoordinate)
+func (gm *InMemoryGameMap) WriteValueToCell(value CellValue, verticalCoordinate int, horizontalCoordinate int) error {
 
-	if getCellValueError != nil {
-		return getCellValueError
+	cellVal, err := gm.GetCellValue(verticalCoordinate, horizontalCoordinate)
+	if err != nil {
+		return fmt.Errorf("cell doesn't exist! vertical coordinate: %d, horizontal coordinate: %d", verticalCoordinate, horizontalCoordinate)
 	}
 
-	setCellValueError := cellVal.SetValue(value)
-
-	if setCellValueError != nil {
-		return setCellValueError
+	if err := cellVal.CheckCellAvailableForWritingValue(value); err != nil {
+		return err
 	}
+
+	gm.gameMap[verticalCoordinate][horizontalCoordinate] = value
 
 	return nil
 }
 
-func (inMemoryGameMap *InMemoryGameMap) GetMap() [][]CellValue {
-	return inMemoryGameMap.gameMap
+func (gm *InMemoryGameMap) GetMap() [][]CellValue {
+	return gm.gameMap
 }
 
-func (inMemoryGameMap *InMemoryGameMap) GetCellValue(verticalCoordinate int, horizontalCoordinate int) (CellValue, error) {
-	if !inMemoryGameMap.checkIsCellAvailable(verticalCoordinate, horizontalCoordinate) {
-		return 0, errors.New("cell is unreachable")
+func (gm *InMemoryGameMap) GetCellValue(verticalCoordinate int, horizontalCoordinate int) (CellValue, error) {
+	if !gm.checkIsCellAvailable(verticalCoordinate, horizontalCoordinate) {
+		return 0, errors.New(fmt.Sprintf("cell doesn't exist. vertical coordinate: %d, horizontal coordinate: %d", verticalCoordinate, horizontalCoordinate))
 	}
-	return inMemoryGameMap.gameMap[verticalCoordinate][horizontalCoordinate], nil
+	return gm.gameMap[verticalCoordinate][horizontalCoordinate], nil
 }
 
-func (inMemoryGameMap *InMemoryGameMap) GetCellValuePointer(verticalCoordinate int, horizontalCoordinate int) (*CellValue, error) {
-	if !inMemoryGameMap.checkIsCellAvailable(verticalCoordinate, horizontalCoordinate) {
-		return nil, errors.New("cell is unreachable")
-	}
-	return &inMemoryGameMap.gameMap[verticalCoordinate][horizontalCoordinate], nil
-}
-
-func (inMemoryGameMap *InMemoryGameMap) CompareCellValueToGivenValue(verticalCoordinate int, horizontalCoordinate int, valueCompareTo CellValue) (bool, error) {
-	cellValue, getCellValueError := inMemoryGameMap.GetCellValue(verticalCoordinate, horizontalCoordinate)
+func (gm *InMemoryGameMap) CompareCellValueToGivenValue(verticalCoordinate int, horizontalCoordinate int, valueCompareTo CellValue) (bool, error) {
+	cellValue, getCellValueError := gm.GetCellValue(verticalCoordinate, horizontalCoordinate)
 	if getCellValueError != nil {
 		return false, getCellValueError
 	}
@@ -92,9 +87,6 @@ func (inMemoryGameMap *InMemoryGameMap) CompareCellValueToGivenValue(verticalCoo
 	return false, nil
 }
 
-func (inMemoryGameMap *InMemoryGameMap) checkIsCellAvailable(verticalCoordinate int, horizontalCoordinate int) bool {
-	if verticalCoordinate >= 0 && horizontalCoordinate >= 0 && verticalCoordinate < inMemoryGameMap.verticalMapSize && horizontalCoordinate < inMemoryGameMap.horizontalMapSize {
-		return true
-	}
-	return false
+func (gm *InMemoryGameMap) checkIsCellAvailable(verticalCoordinate int, horizontalCoordinate int) bool {
+	return verticalCoordinate >= 0 && horizontalCoordinate >= 0 && verticalCoordinate < gm.verticalMapSize && horizontalCoordinate < gm.horizontalMapSize
 }

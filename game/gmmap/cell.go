@@ -5,15 +5,15 @@ import (
 )
 
 const (
-	EmptyCell 	CellValue = 0
-	CrossCell 	CellValue = 1
-	CircleCell 	CellValue = 2
+	EmptyCell  CellValue = 0
+	CrossCell  CellValue = 1
+	CircleCell CellValue = 2
 )
 
 type CellValue int
 
-func (cellValue CellValue) String () string {
-	switch cellValue {
+func (val CellValue) String() string {
+	switch val {
 	case EmptyCell:
 		return "_"
 	case CrossCell:
@@ -25,19 +25,22 @@ func (cellValue CellValue) String () string {
 	}
 }
 
-func (cellValue CellValue) IsEmpty () bool  {
-	return cellValue == EmptyCell
+func (val CellValue) IsEmpty() bool {
+	return val == EmptyCell
 }
 
-func (cellValue *CellValue) SetValue (value CellValue) error {
-	if !cellValue.IsEmpty() {
+func (val CellValue) IsValueAllowed(value CellValue) bool {
+	return value == EmptyCell || value == CircleCell || value == CrossCell
+}
+
+func (val CellValue) CheckCellAvailableForWritingValue(applicantForWriting CellValue) error {
+	if !val.IsEmpty() {
 		return errors.New("cell is not empty")
 	}
 
-	if value != EmptyCell && value != CircleCell && value != CrossCell {
+	if !val.IsValueAllowed(applicantForWriting) {
 		return errors.New("unknown value")
 	}
 
-	*cellValue = value
 	return nil
 }
