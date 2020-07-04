@@ -69,7 +69,7 @@ func (gm *InMemoryGameMap) GetMap() [][]CellValue {
 
 func (gm *InMemoryGameMap) GetCellValue(verticalCoordinate int, horizontalCoordinate int) (CellValue, error) {
 	if !gm.checkIsCellAvailable(verticalCoordinate, horizontalCoordinate) {
-		return 0, errors.New(fmt.Sprintf("cell doesn't exist. vertical coordinate: %d, horizontal coordinate: %d", verticalCoordinate, horizontalCoordinate))
+		return 0, fmt.Errorf("cell doesn't exist. vertical coordinate: %d, horizontal coordinate: %d", verticalCoordinate, horizontalCoordinate)
 	}
 	return gm.gameMap[verticalCoordinate][horizontalCoordinate], nil
 }
