@@ -51,7 +51,7 @@ func (gm *InMemoryGameMap) WriteValueToCell(value CellValue, verticalCoordinate 
 
 	cellVal, err := gm.GetCellValue(verticalCoordinate, horizontalCoordinate)
 	if err != nil {
-		return errors.New(fmt.Sprintf("cell doesn't exist! vertical coordinate: %d, horizontal coordinate: %d", verticalCoordinate, horizontalCoordinate))
+		return fmt.Errorf("cell doesn't exist! vertical coordinate: %d, horizontal coordinate: %d", verticalCoordinate, horizontalCoordinate)
 	}
 
 	if err := cellVal.CheckCellAvailableForWritingValue(value); err != nil {

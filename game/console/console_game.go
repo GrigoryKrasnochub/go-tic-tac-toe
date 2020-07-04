@@ -11,7 +11,7 @@ import (
 	"github.com/GrigoryKrasnochub/go-tic-tac-toe/game"
 )
 
-var UserInputRegexp = regexp.MustCompile(`(\d+)\s+(\d+)`)
+var userInputRegexp = regexp.MustCompile(`(\d+)\s+(\d+)`)
 
 func PrintMap(userGame game.Game) {
 	gameMap := userGame.GetMap()
@@ -52,7 +52,7 @@ func DoConsoleGame() {
 		fmt.Println("Please write game map size in format \"VerticalMapSize HorizontalMapSize\" (without semicolons)")
 		fmt.Print(">")
 		text, _ := reader.ReadString('\n')
-		userMapSize := UserInputRegexp.FindStringSubmatch(text)
+		userMapSize := userInputRegexp.FindStringSubmatch(text)
 		if userMapSize == nil || userMapSize[1] == "" || userMapSize[2] == "" {
 			errorMessage = "incorrect format"
 			continue
@@ -98,7 +98,7 @@ func consoleGame(userGame game.Game) bool {
 		fmt.Println("Make your turn, write coordinates in format \"VerticalCoordinate HorizontalCoordinate\" (without semicolons)")
 		fmt.Print(">")
 		text, _ := reader.ReadString('\n')
-		userCoordinates := UserInputRegexp.FindStringSubmatch(text)
+		userCoordinates := userInputRegexp.FindStringSubmatch(text)
 		if userCoordinates == nil || userCoordinates[1] == "" || userCoordinates[2] == "" {
 			errorMessage = "incorrect format"
 			continue

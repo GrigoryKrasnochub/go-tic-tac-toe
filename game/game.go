@@ -227,7 +227,7 @@ func (game Game) isNextTurnAvailable() bool {
 	gameMap := game.GetMap()
 	for _, gameMapRow := range gameMap {
 		for _, gameMapCell := range gameMapRow {
-			if gameMapCell == gmmap.EmptyCell {
+			if gameMapCell.IsEmpty() {
 				return true
 			}
 		}
